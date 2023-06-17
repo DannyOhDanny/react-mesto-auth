@@ -3,8 +3,10 @@ import { useRef } from 'react';
 import PopupWithForm from './PopupWithForm';
 
 function EditAvatarPopup(props) {
+  //Неуправляемый импут
   const avatarRef = useRef('');
 
+  //обработчик сабмита формы
   function handleSubmit(e) {
     e.preventDefault();
     /* Значение инпута, полученное с помощью рефа */
@@ -12,9 +14,6 @@ function EditAvatarPopup(props) {
       avatar: avatarRef.current.value
     });
   }
-  //const onClear = () => {
-  // avatarRef.current.value = '';
-  //};
 
   return (
     <PopupWithForm

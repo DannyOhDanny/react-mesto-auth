@@ -4,18 +4,24 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import PopupWithForm from './PopupWithForm';
 
 function EditProfilePopup(props) {
+  //Подписка на контекст currentUser
   const currentUser = useContext(CurrentUserContext);
+
+  // Стейты изменения данных пользователя
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
+  // Обработчик импута с именем пользователя
   function handleNameChange(e) {
     setName(e.target.value);
   }
 
+  // Обработчик импута с описанием пользователя
   function handleDescriptionChange(e) {
     setDescription(e.target.value);
   }
 
+  // Обработчик сабмита формы
   function handleSubmit(e) {
     // Запрещаем браузеру переходить по адресу формы
     e.preventDefault();
@@ -25,7 +31,7 @@ function EditProfilePopup(props) {
       about: description
     });
   }
-
+  // Очистка импутов  при открытии попапа
   useEffect(() => {
     setName('');
     setDescription('');

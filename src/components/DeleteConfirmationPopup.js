@@ -1,8 +1,8 @@
 import React from 'react';
-
 import PopupWithForm from './PopupWithForm';
 
 function DeleteConfirmationPopup(props) {
+  //Обработка сабмита с удалением карточки
   function handleSubmit(e) {
     e.preventDefault();
     props.onDeleteCard(props.card);

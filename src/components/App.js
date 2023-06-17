@@ -1,7 +1,7 @@
 import React from 'react';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import api from '../utils/api.js';
 import Header from './Header';
 import Main from './Main';
@@ -13,21 +13,29 @@ import AddPlacePopup from './AddPlacePopup';
 import DeleteConfirmationPopup from './DeleteConfirmationPopup';
 import Login from './Login';
 import Register from './Register';
+import ProtectedRoute from './ProtectedRoute';
+import InfoTooltip from './InfoTooltip';
 
 function App() {
+  //Стейты карточки
   const [cards, setCards] = useState([]);
+  const [deletedCard, setDeletedCard] = useState(null);
+  const [selectedCard, setSelectedCard] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Стейты попапов
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
   const [isImagePopupOpen, setImagePopupOpen] = useState(false);
-  const [deletedCard, setDeletedCard] = useState(null);
+  const [isInfoTooltipPopupOpen, setInfoTooltipPopupOpen] = useState(false);
 
-  const [selectedCard, setSelectedCard] = useState({});
+  //Стейты пользователя
   const [currentUser, setCurrentUser] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  //Получаем  данные пользователя с ервера
   useEffect(() => {
     api
       .getUserInfo()
@@ -48,6 +56,7 @@ function App() {
       });
   }, []);
 
+  //Получаем карточки с сервера
   useEffect(() => {
     api
       .getCardsFromServer()
@@ -61,6 +70,7 @@ function App() {
       });
   }, []);
 
+  //Открытие попапов
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
   }
@@ -72,6 +82,7 @@ function App() {
     setIsAddPlacePopupOpen(true);
   }
 
+  //Закрытие попапов
   function closeAllPopups() {
     setIsAddPlacePopupOpen(false);
     setIsEditProfilePopupOpen(false);
@@ -79,16 +90,17 @@ function App() {
     setDeletePopupOpen(false);
     setImagePopupOpen(false);
     setSelectedCard({});
+    setInfoTooltipPopupOpen(false);
   }
 
+  //Открытие попапа изображения
   function handleCardClick(card) {
     setSelectedCard(card);
   }
-
+  //Обработка лайка карточки с запросом на сервер
   function handleCardLike(card) {
     const isLiked = card.likes.some(item => item._id === currentUser._id);
     // Отправляем запрос в API и получаем обновлённые данные карточки
-
     (!isLiked ? api.putUserLike(card._id) : api.deleteUserLike(card._id))
       .then(newCard => {
         setCards(state => state.map(c => (c._id === card._id ? newCard : c)));
@@ -97,7 +109,7 @@ function App() {
         console.error(`Возникла ошибка при постановке лайка:${err} - ${err.statusText}`);
       });
   }
-
+  //Обработка удаления карточки с запросом на сервер
   function handleCardDelete(card) {
     setIsLoading(true);
     api
@@ -115,6 +127,7 @@ function App() {
       .finally(() => setIsLoading(false));
   }
 
+  //Обработка изменения информации о пользователе с запросом на сервер
   function handleUpdateUser({ name, about }) {
     setIsLoading(true);
     api
@@ -129,6 +142,7 @@ function App() {
       .finally(() => setIsLoading(false));
   }
 
+  //Обработка изменения аватара с запросом на сервер
   function handleUpdateAvatar({ avatar }) {
     setIsLoading(true);
     api
@@ -143,6 +157,7 @@ function App() {
       .finally(() => setIsLoading(false));
   }
 
+  //Обработка добавления карточки с запросом на сервер
   function handleAddPlaceSubmit({ name, link }) {
     setIsLoading(true);
     api
@@ -157,6 +172,7 @@ function App() {
       .finally(() => setIsLoading(false));
   }
 
+  //Обработка клика удаления карточки с передачей card
   function handleTrashBtnClick(card) {
     setDeletePopupOpen(true);
     setDeletedCard(card);
@@ -166,24 +182,38 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="root">
         <div className="page">
-          <Header />
-          <Main
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            cards={cards}
-            onTrashBtnClick={handleTrashBtnClick}
-          />
-          <Footer />
-          <Login></Login>
-          <Register></Register>
+          <Header isLoggedIn={isLoggedIn} />
           <Routes>
-            <Route path="/" element={<></>}></Route>
-            <Route path="/sign-up" element={<></>}></Route>
-            <Route path="/sign-in" element={<></>}></Route>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute
+                  element={Main}
+                  cards={cards}
+                  isLoggedIn={isLoggedIn}
+                  onEditProfile={handleEditProfileClick}
+                  onAddPlace={handleAddPlaceClick}
+                  onEditAvatar={handleEditAvatarClick}
+                  onCardClick={handleCardClick}
+                  onCardLike={handleCardLike}
+                  onTrashBtnClick={handleTrashBtnClick}
+                />
+              }
+            />
+
+            <Route path="/sign-up" element={<Register onRegister={<></>} />} />
+
+            <Route path="/sign-in" element={<Login onLogin={() => setIsLoggedIn(true)} />} />
+
+            <Route
+              path="/"
+              element={
+                isLoggedIn ? <Navigate to="/" replace /> : <Navigate to="/sign-in" replace />
+              }
+            />
           </Routes>
+          <Footer />
+
           <EditProfilePopup
             isOpen={isEditProfilePopupOpen}
             onClose={closeAllPopups}
@@ -197,12 +227,14 @@ function App() {
             onUpdateAvatar={handleUpdateAvatar}
             isLoading={isLoading}
           />
+
           <AddPlacePopup
             isOpen={isAddPlacePopupOpen}
             onClose={closeAllPopups}
             onAddPlace={handleAddPlaceSubmit}
             isLoading={isLoading}
           ></AddPlacePopup>
+
           <DeleteConfirmationPopup
             isOpen={isDeletePopupOpen}
             onClose={closeAllPopups}
@@ -210,7 +242,10 @@ function App() {
             card={deletedCard}
             isLoading={isLoading}
           ></DeleteConfirmationPopup>
+
           <ImagePopup isOpen={isImagePopupOpen} onClose={closeAllPopups} card={selectedCard} />
+
+          <InfoTooltip isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups}></InfoTooltip>
         </div>
       </div>
     </CurrentUserContext.Provider>

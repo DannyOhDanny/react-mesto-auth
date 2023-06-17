@@ -3,6 +3,7 @@ import iconClose from '../images/popup__button-close.svg';
 import { useEffect } from 'react';
 
 function PopupWithForm(props) {
+  //Закрытие попапа по Esc
   useEffect(() => {
     function handleEscapeKey(event: KeyboardEvent) {
       if (event.code === 'Escape') {
@@ -14,6 +15,7 @@ function PopupWithForm(props) {
     return () => document.removeEventListener('keydown', handleEscapeKey);
   }, []);
 
+  //Закрытие попапа по клику на overlay
   function handleClickonOverlay(e) {
     props.onClose();
   }

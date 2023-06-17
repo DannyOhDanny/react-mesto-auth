@@ -1,0 +1,8 @@
+.auth__error {
+  margin: 10px 36px 5px 36px;
+  padding: 0;
+  color: red;
+  font-weight: 400;
+  font-size: 14px;
+  text-align: start;
+}

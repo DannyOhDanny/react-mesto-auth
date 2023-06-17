@@ -47,12 +47,17 @@
 @import url(./blocks/popup/__title/popup__title.css);
 @import url(./blocks/auth/auth.css);
 @import url(./blocks/auth/__redirect/auth__redirect.css);
+@import url(./blocks/auth/__note/auth__note.css);
 @import url(./blocks/auth/__link/auth__link.css);
 @import url(./blocks/auth/__header/auth__header.css);
 @import url(./blocks/auth/__button_container/auth__button-container.css);
+@import url(./blocks/auth/__error/auth__error.css);
 @import url(./blocks/auth/__input/auth__input.css);
 @import url(./blocks/auth/__form/auth__form.css);
 @import url(./blocks/auth/__button/auth__button.css);
+@import url(./blocks/auth-popup/auth-popup.css);
+@import url(./blocks/auth-popup/__image/auth-popup__image.css);
+@import url(./blocks/auth-popup/__caption/auth-popup__caption.css);
 
 @import url(./blocks/page/page.css);
 @import url(./blocks/root/root.css);

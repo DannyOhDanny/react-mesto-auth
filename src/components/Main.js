@@ -3,6 +3,7 @@ import Card from './Card';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function Main(props) {
+  //Подписка на контекст currentUser
   const currentUser = React.useContext(CurrentUserContext);
 
   return (

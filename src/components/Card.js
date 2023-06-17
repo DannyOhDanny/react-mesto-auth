@@ -3,7 +3,9 @@ import iconDelete from '../images/element_delete-pic.svg';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function Card(props) {
+  //Подписка на контекст currentUser
   const currentUser = React.useContext(CurrentUserContext);
+  //Проверка своей карточки для отображения корзины
   const isOwn = props.card.owner._id === currentUser._id;
   //console.log(currentUser._id);
   const isLiked = props.card.likes.some(item => item._id === currentUser._id);
@@ -15,10 +17,6 @@ function Card(props) {
   function handleLikeClick() {
     props.onCardLike(props.card);
   }
-
-  //function handleCardDelete() {
-  //props.onCardDelete(props.card);
-  //}
 
   return (
     <article key={props.card._id} className="element" data-card-id={props.card._id}>
