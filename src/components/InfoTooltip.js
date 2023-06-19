@@ -1,7 +1,7 @@
 import React from 'react';
 import iconClose from '../images/popup__button-close.svg';
 import errorAuth from '../images/element_error-auth.svg';
-import correctAuth from '../images/element_correct_auth.svg';
+import successAuth from '../images/element_correct-auth.svg';
 
 function InfoTooltip(props) {
   function handleClickOnOverlay(e) {
@@ -25,8 +25,17 @@ function InfoTooltip(props) {
           aria-label="Close"
         ></button>
         <div className="auth-popup">
-          <img className="auth-popup__image" src={errorAuth} alt="предупреждение" />
-          <p className="auth-popup__caption">Что-то пошло не так! Попробуйте ещё раз.</p>
+          <img
+            className="auth-popup__image"
+            src={props.isSuccess ? successAuth : errorAuth}
+            alt="icon"
+          />
+          <p className="auth-popup__caption">
+            {props.isSuccess
+              ? `Вы успешно авторизировались!`
+              : `Что-то пошло не так!
+            Попробуйте еще раз.`}
+          </p>
         </div>
       </div>
     </div>

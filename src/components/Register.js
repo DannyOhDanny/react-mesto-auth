@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import * as auth from '../utils/auth';
 
-function Register() {
+function Register(props) {
   const [formValue, setFormValue] = useState({
     email: '',
     password: ''
@@ -11,7 +11,11 @@ function Register() {
 
   const navigate = useNavigate();
 
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  // function isValidEmail(formValue) {
+  //   return /\S+@\S+\.\S+/.test(formValue.email);
+  // }
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -31,17 +35,20 @@ function Register() {
     auth
       .register(email, password)
       .then(data => {
+        props.setIsSuccess(true);
         navigate('/sign-in', { replace: true });
       })
       .catch(error => {
-        setErrorMessage((error.message = 'Пользователь с таким email уже зарегистрирован'));
-      });
+        props.setIsSuccess(false);
+        setErrorMessage((error = 'Пользователь с таким email уже зарегистрирован'));
+      })
+      .finally(() => props.setInfoTooltipPopupOpen(true));
   };
 
   return (
     <div className="auth">
       <h2 className="auth__header">Регистрация</h2>
-      <form onSubmit={handleSubmit} className="auth__form">
+      <form onSubmit={handleSubmit} className="auth__form" id="reg-form">
         <input
           className="auth__input"
           //required

@@ -20,10 +20,14 @@ function Login({ onLogin }) {
 
   const handleSubmit = e => {
     e.preventDefault();
+    if (!formValue.email || !formValue.password) {
+      setErrorMessage('Заполните все поля формы');
+      return;
+    }
     auth
       .login(formValue.email, formValue.password)
       .then(data => {
-        localStorage.setItem('jwt', data.jwt);
+        localStorage.setItem('jwt', data.token);
         onLogin();
         navigate('/', { replace: true });
       })
@@ -35,10 +39,10 @@ function Login({ onLogin }) {
   return (
     <div className="auth">
       <h2 className="auth__header">Вход</h2>
-      <form onSubmit={handleSubmit} sclassName="auth__form">
+      <form onSubmit={handleSubmit} className="auth__form" id="log-form">
         <input
           className="auth__input"
-          required
+          //required
           id="email"
           name="email"
           type="email"
@@ -48,7 +52,7 @@ function Login({ onLogin }) {
         />
         <input
           className="auth__input"
-          required
+          //required
           id="password"
           name="password"
           type="password"

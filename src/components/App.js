@@ -1,8 +1,9 @@
 import React from 'react';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import api from '../utils/api.js';
+import * as auth from '../utils/auth';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -15,6 +16,7 @@ import Login from './Login';
 import Register from './Register';
 import ProtectedRoute from './ProtectedRoute';
 import InfoTooltip from './InfoTooltip';
+import { isEditable } from '@testing-library/user-event/dist/utils';
 
 function App() {
   //Стейты карточки
@@ -30,17 +32,20 @@ function App() {
   const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
   const [isImagePopupOpen, setImagePopupOpen] = useState(false);
   const [isInfoTooltipPopupOpen, setInfoTooltipPopupOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   //Стейты пользователя
   const [currentUser, setCurrentUser] = useState({});
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const [isEmail, setIsEmail] = useState(null);
 
+  const navigate = useNavigate();
   //Получаем  данные пользователя с ервера
   useEffect(() => {
     api
       .getUserInfo()
       .then(data => {
-        console.log(data);
+        //console.log(data);
         setCurrentUser({
           _id: data._id,
           name: data.name,
@@ -109,6 +114,7 @@ function App() {
         console.error(`Возникла ошибка при постановке лайка:${err} - ${err.statusText}`);
       });
   }
+
   //Обработка удаления карточки с запросом на сервер
   function handleCardDelete(card) {
     setIsLoading(true);
@@ -178,11 +184,43 @@ function App() {
     setDeletedCard(card);
   }
 
+  //Проверка токена jwt
+  const checkToken = () => {
+    const jwt = localStorage.getItem('jwt');
+    auth
+      .getContent(jwt)
+      .then(res => {
+        if (!res) {
+          return;
+        }
+
+        if (res) {
+          setIsEmail(res.data);
+          setIsLoggedIn(true);
+          navigate('/', { replace: true });
+        }
+      })
+      .catch(err => {
+        setIsLoggedIn(false);
+        console.log((err = 'Переданный токен некорректен'));
+      });
+  };
+
+  //Отрисовка токена jwt 1 раз
+  useEffect(() => {
+    checkToken();
+  }, []);
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="root">
         <div className="page">
-          <Header isLoggedIn={isLoggedIn} />
+          <Header
+            isLoggedIn={isLoggedIn}
+            isEmail={isEmail}
+            setIsEmail={setIsEmail}
+            setIsLoggedIn={setIsLoggedIn}
+          />
           <Routes>
             <Route
               path="/"
@@ -201,7 +239,17 @@ function App() {
               }
             />
 
-            <Route path="/sign-up" element={<Register onRegister={<></>} />} />
+            <Route
+              path="/sign-up"
+              element={
+                <Register
+                  isOpen={isInfoTooltipPopupOpen}
+                  isSuccess={isSuccess}
+                  setInfoTooltipPopupOpen={setInfoTooltipPopupOpen}
+                  setIsSuccess={setIsSuccess}
+                />
+              }
+            />
 
             <Route path="/sign-in" element={<Login onLogin={() => setIsLoggedIn(true)} />} />
 
@@ -245,7 +293,11 @@ function App() {
 
           <ImagePopup isOpen={isImagePopupOpen} onClose={closeAllPopups} card={selectedCard} />
 
-          <InfoTooltip isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups}></InfoTooltip>
+          <InfoTooltip
+            isOpen={isInfoTooltipPopupOpen}
+            onClose={closeAllPopups}
+            isSuccess={isSuccess}
+          ></InfoTooltip>
         </div>
       </div>
     </CurrentUserContext.Provider>

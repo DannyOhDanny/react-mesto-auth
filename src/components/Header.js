@@ -1,20 +1,13 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import logo from '../images/logo-pic.svg';
+import NavBar from './NavBar';
 
 function Header(props) {
   return (
     <header className="header">
       <img className="header__logo" src={logo} alt="Лого" />
-      {props.isLoggedIn ? (
-        <Link className="header__link" to="/">
-          Войти
-        </Link>
-      ) : (
-        <Link className="header__link" to="/sign-up">
-          Регистрация
-        </Link>
-      )}
+      <div className="header__email">{props.isEmail?.email}</div>
+      {<NavBar setIsEmail={props.setIsEmail} setIsLoggedIn={props.setIsLoggedIn}></NavBar>}
     </header>
   );
 }
