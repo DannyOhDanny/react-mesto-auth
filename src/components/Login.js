@@ -1,7 +1,30 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as auth from '../utils/auth';
+
+// Правила валидации импутов
+const validators = {
+  email: {
+    required: value => {
+      return value === '';
+    },
+    isEmail: value => {
+      return !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value);
+    }
+  },
+  password: {
+    required: value => {
+      return value === '';
+    },
+    minLength: value => {
+      return value.length < 3;
+    },
+    containNumbers: value => {
+      return !/[0-9]/.test(value);
+    }
+  }
+};
 
 function Login({ onLogin }) {
   const [formValue, setFormValue] = useState({
@@ -12,6 +35,45 @@ function Login({ onLogin }) {
   const navigate = useNavigate();
 
   const [errorMessage, setErrorMessage] = useState('');
+  //Отслеживание ошибок валидации
+  const [errors, setErrors] = useState({
+    email: {
+      required: true,
+      isEmail: true
+    },
+    password: {
+      required: true,
+      minLength: true,
+      containNumbers: true
+    }
+  });
+
+  //Валидация импутов
+  useEffect(
+    function validateInputs() {
+      const { email, password } = formValue;
+      // Находим прогоняем значение импута по ключам объекта validators
+      const emailValidationResult = Object.keys(validators.email)
+        .map(errorKey => {
+          const errorResult = validators.email[errorKey](email);
+          return { [errorKey]: errorResult };
+        })
+        .reduce((acc, element) => ({ ...acc, ...element }), {});
+      const passwordValidationResult = Object.keys(validators.password)
+        .map(errorKey => {
+          const errorResult = validators.password[errorKey](password);
+          return { [errorKey]: errorResult };
+        })
+        //собираем новые значения в новый объект
+        .reduce((acc, element) => ({ ...acc, ...element }), {});
+      //Соединяем { } cо значениями ошибок и объект с валидацией импутов
+      setErrors({ email: emailValidationResult, password: passwordValidationResult });
+
+      //console.log(emailValidationResult, passwordValidationResult);
+    },
+    //зависимости
+    [formValue, setErrors]
+  );
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -50,6 +112,8 @@ function Login({ onLogin }) {
           onChange={handleChange}
           placeholder="Email"
         />
+        {errors.email.required && <p className="auth__error">Обязательное поле</p>}
+        {errors.email.isEmail && <p className="auth__error">Укажите электронный адрес</p>}
         <input
           className="auth__input"
           //required
@@ -60,6 +124,13 @@ function Login({ onLogin }) {
           onChange={handleChange}
           placeholder="Пароль"
         />
+        {errors.password.required && <p className="auth__error">Обязательное поле</p>}
+
+        {errors.password.minLength && <p className="auth__error">Количество символов меньше 3</p>}
+
+        {errors.password.containNumbers && (
+          <p className="auth__error">Пароль должен содержать цифры</p>
+        )}
         <p className="auth__error">{errorMessage}</p>
         <div className="auth__button-container">
           <button type="submit" className="auth__button">

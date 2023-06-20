@@ -5,8 +5,8 @@ import { useEffect } from 'react';
 function PopupWithForm(props) {
   //Закрытие попапа по Esc
   useEffect(() => {
-    function handleEscapeKey(event: KeyboardEvent) {
-      if (event.code === 'Escape') {
+    function handleEscapeKey(event) {
+      if (event.key === 'Escape') {
         props.onClose();
       }
     }
