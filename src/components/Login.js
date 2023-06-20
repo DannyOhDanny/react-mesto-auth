@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import * as auth from '../utils/auth';
 
 // Правила валидации импутов
@@ -34,7 +34,9 @@ function Login({ onLogin }) {
 
   const navigate = useNavigate();
 
+  //Стейт ошибок сервера
   const [errorMessage, setErrorMessage] = useState('');
+
   //Отслеживание ошибок валидации
   const [errors, setErrors] = useState({
     email: {
@@ -52,23 +54,22 @@ function Login({ onLogin }) {
   useEffect(
     function validateInputs() {
       const { email, password } = formValue;
-      // Находим прогоняем значение импута по ключам объекта validators
+      // Прогоняем значение импута по ключам объекта validators
       const emailValidationResult = Object.keys(validators.email)
         .map(errorKey => {
           const errorResult = validators.email[errorKey](email);
           return { [errorKey]: errorResult };
         })
+        //собираем новые значения в новый объект
         .reduce((acc, element) => ({ ...acc, ...element }), {});
       const passwordValidationResult = Object.keys(validators.password)
         .map(errorKey => {
           const errorResult = validators.password[errorKey](password);
           return { [errorKey]: errorResult };
         })
-        //собираем новые значения в новый объект
         .reduce((acc, element) => ({ ...acc, ...element }), {});
       //Соединяем { } cо значениями ошибок и объект с валидацией импутов
       setErrors({ email: emailValidationResult, password: passwordValidationResult });
-
       //console.log(emailValidationResult, passwordValidationResult);
     },
     //зависимости
@@ -90,7 +91,7 @@ function Login({ onLogin }) {
       .login(formValue.email, formValue.password)
       .then(data => {
         localStorage.setItem('jwt', data.token);
-        onLogin();
+        onLogin(true);
         navigate('/', { replace: true });
       })
       .catch(err => {
@@ -126,10 +127,12 @@ function Login({ onLogin }) {
         />
         {errors.password.required && <p className="auth__error">Обязательное поле</p>}
 
-        {errors.password.minLength && <p className="auth__error">Количество символов меньше 3</p>}
+        {errors.password.minLength && (
+          <p className="auth__error">Минимальная длина пароля: 3 символа</p>
+        )}
 
         {errors.password.containNumbers && (
-          <p className="auth__error">Пароль должен содержать цифры</p>
+          <p className="auth__error">Пароль должен состоять из цифр</p>
         )}
         <p className="auth__error">{errorMessage}</p>
         <div className="auth__button-container">

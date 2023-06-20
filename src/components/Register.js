@@ -94,13 +94,14 @@ function Register(props) {
       .register(email, password)
       .then(data => {
         props.setIsSuccess(true);
+        props.setInfoTooltipPopupOpen(true);
         navigate('/sign-in', { replace: true });
       })
       .catch(error => {
         props.setIsSuccess(false);
+        props.setInfoTooltipPopupOpen(true);
         setErrorMessage((error = 'Пользователь с таким email уже зарегистрирован'));
-      })
-      .finally(() => props.setInfoTooltipPopupOpen(true));
+      });
   };
 
   return (
@@ -132,10 +133,12 @@ function Register(props) {
         />
         {errors.password.required && <p className="auth__error">Обязательное поле</p>}
 
-        {errors.password.minLength && <p className="auth__error">Количество символов меньше 3</p>}
+        {errors.password.minLength && (
+          <p className="auth__error">Минимальная длина пароля: 3 символа</p>
+        )}
 
         {errors.password.containNumbers && (
-          <p className="auth__error">Пароль должен содержать цифры</p>
+          <p className="auth__error">Пароль должен состоять из цифр</p>
         )}
 
         <p className="auth__error">{errorMessage}</p>

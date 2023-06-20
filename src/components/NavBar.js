@@ -7,7 +7,7 @@ function NavBar(props) {
   function signOut() {
     localStorage.removeItem('jwt');
     props.setIsLoggedIn(false);
-    props.setIsEmail(null);
+    props.setIsEmail([]);
     navigate('/sign-in', { replace: true });
   }
 

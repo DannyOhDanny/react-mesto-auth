@@ -27,8 +27,8 @@ function InfoTooltip(props) {
         <div className="auth-popup">
           <img
             className="auth-popup__image"
-            src={props.isSuccess ? successAuth : errorAuth}
             alt="icon"
+            src={props.isSuccess ? successAuth : errorAuth}
           />
           <p className="auth-popup__caption">
             {props.isSuccess

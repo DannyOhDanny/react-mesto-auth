@@ -16,7 +16,6 @@ import Login from './Login';
 import Register from './Register';
 import ProtectedRoute from './ProtectedRoute';
 import InfoTooltip from './InfoTooltip';
-import { isEditable } from '@testing-library/user-event/dist/utils';
 
 function App() {
   //Стейты карточки
@@ -37,10 +36,11 @@ function App() {
   //Стейты пользователя
   const [currentUser, setCurrentUser] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(null);
-  const [isEmail, setIsEmail] = useState(null);
+  const [isEmail, setIsEmail] = useState([]);
 
   const navigate = useNavigate();
-  //Получаем  данные пользователя с ервера
+
+  //Получаем  данные пользователя с cервера
   useEffect(() => {
     api
       .getUserInfo()
@@ -190,14 +190,13 @@ function App() {
     auth
       .getContent(jwt)
       .then(res => {
-        if (!res) {
-          return;
-        }
-
         if (res) {
           setIsEmail(res.data);
           setIsLoggedIn(true);
           navigate('/', { replace: true });
+        }
+        if (!res) {
+          return;
         }
       })
       .catch(err => {
@@ -209,17 +208,19 @@ function App() {
   //Отрисовка токена jwt 1 раз
   useEffect(() => {
     checkToken();
-  }, []);
+  }, [isEmail]);
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
+    <CurrentUserContext.Provider
+      value={{ currentUser: currentUser, isLoggedin: isLoggedIn, isEmail: isEmail }}
+    >
       <div className="root">
         <div className="page">
           <Header
             isLoggedIn={isLoggedIn}
-            isEmail={isEmail}
-            setIsEmail={setIsEmail}
             setIsLoggedIn={setIsLoggedIn}
+            // isEmail={isEmail}
+            setIsEmail={setIsEmail}
           />
           <Routes>
             <Route
@@ -251,7 +252,7 @@ function App() {
               }
             />
 
-            <Route path="/sign-in" element={<Login onLogin={() => setIsLoggedIn(true)} />} />
+            <Route path="/sign-in" element={<Login onLogin={setIsLoggedIn} />} />
 
             <Route
               path="/"
@@ -260,7 +261,8 @@ function App() {
               }
             />
           </Routes>
-          <Footer />
+
+          {isLoggedIn && <Footer />}
 
           <EditProfilePopup
             isOpen={isEditProfilePopupOpen}
@@ -294,9 +296,9 @@ function App() {
           <ImagePopup isOpen={isImagePopupOpen} onClose={closeAllPopups} card={selectedCard} />
 
           <InfoTooltip
+            isSuccess={isSuccess}
             isOpen={isInfoTooltipPopupOpen}
             onClose={closeAllPopups}
-            isSuccess={isSuccess}
           ></InfoTooltip>
         </div>
       </div>
