@@ -208,11 +208,11 @@ function App() {
   //Отрисовка токена jwt 1 раз
   useEffect(() => {
     checkToken();
-  }, [isEmail]);
+  }, [isEmail, isLoggedIn]);
 
   return (
     <CurrentUserContext.Provider
-      value={{ currentUser: currentUser, isLoggedin: isLoggedIn, isEmail: isEmail }}
+      value={{ currentUser: currentUser, isLoggedIn: isLoggedIn, isEmail: isEmail }}
     >
       <div className="root">
         <div className="page">
