@@ -4,6 +4,7 @@ import errorAuth from '../images/element_error-auth.svg';
 import successAuth from '../images/element_correct-auth.svg';
 
 function InfoTooltip(props) {
+  //Ф-ия закрытия по клику на оверлей
   function handleClickOnOverlay(e) {
     props.onClose();
   }
@@ -30,12 +31,7 @@ function InfoTooltip(props) {
             alt="icon"
             src={props.isSuccess ? successAuth : errorAuth}
           />
-          <p className="auth-popup__caption">
-            {props.isSuccess
-              ? `Вы успешно авторизировались!`
-              : `Что-то пошло не так!
-            Попробуйте еще раз.`}
-          </p>
+          <p className="auth-popup__caption">{props.isSuccess ? props.onSuccess : props.onError}</p>
         </div>
       </div>
     </div>

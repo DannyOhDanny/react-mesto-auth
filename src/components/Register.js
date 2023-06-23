@@ -27,6 +27,7 @@ const validators = {
 };
 
 function Register(props) {
+  // редирект с помощью хука useNavigate
   const navigate = useNavigate();
 
   //Отслеживание ошибок от сервера
@@ -75,33 +76,16 @@ function Register(props) {
     [formValue, setErrors]
   );
 
+  //Сохранение значений импутов по event в объект
   const handleChange = e => {
     const { name, value } = e.target;
     setFormValue({ ...formValue, [name]: value });
   };
 
+  //Обработка сабмита + вызов колбека из App
   const handleSubmit = e => {
     e.preventDefault();
-
-    if (!formValue.email || !formValue.password) {
-      setErrorMessage('Заполните все поля формы');
-      return;
-    }
-
-    const { email, password } = formValue;
-
-    auth
-      .register(email, password)
-      .then(data => {
-        props.setIsSuccess(true);
-        props.setInfoTooltipPopupOpen(true);
-        navigate('/sign-in', { replace: true });
-      })
-      .catch(error => {
-        props.setIsSuccess(false);
-        props.setInfoTooltipPopupOpen(true);
-        setErrorMessage((error = 'Пользователь с таким email уже зарегистрирован'));
-      });
+    props.onRegister(formValue, setErrorMessage);
   };
 
   return (

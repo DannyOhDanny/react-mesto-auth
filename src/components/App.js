@@ -35,8 +35,8 @@ function App() {
 
   //Стейты пользователя
   const [currentUser, setCurrentUser] = useState({});
-  const [isLoggedIn, setIsLoggedIn] = useState(null);
-  const [isEmail, setIsEmail] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isEmail, setIsEmail] = useState('');
 
   const navigate = useNavigate();
 
@@ -59,7 +59,7 @@ function App() {
           `Возникла ошибка загрузки данных пользователя с сервера:${err} - ${err.statusText}`
         );
       });
-  }, []);
+  }, [isLoggedIn]);
 
   //Получаем карточки с сервера
   useEffect(() => {
@@ -73,7 +73,7 @@ function App() {
           `Возникла ошибка загрузки данных карточек с сервера:${err} - ${err.statusText}`
         );
       });
-  }, []);
+  }, [isLoggedIn]);
 
   //Открытие попапов
   function handleEditAvatarClick() {
@@ -208,7 +208,46 @@ function App() {
   //Отрисовка токена jwt 1 раз
   useEffect(() => {
     checkToken();
-  }, [isEmail, isLoggedIn]);
+  }, []);
+
+  function handleRegister(formValue, setErrorMessage) {
+    if (!formValue.email || !formValue.password) {
+      setErrorMessage('Заполните все поля формы');
+      return;
+    }
+
+    const { email, password } = formValue;
+
+    auth
+      .register(email, password)
+      .then(data => {
+        setIsSuccess(true);
+        setInfoTooltipPopupOpen(true);
+        navigate('/sign-in', { replace: true });
+      })
+      .catch(error => {
+        setIsSuccess(false);
+        setInfoTooltipPopupOpen(true);
+        setErrorMessage((error = 'Пользователь с таким email уже зарегистрирован'));
+      });
+  }
+
+  function onLoggedIn(formValue, onLogin, setErrorMessage) {
+    if (!formValue.email || !formValue.password) {
+      setErrorMessage('Заполните все поля формы');
+      return;
+    }
+    auth
+      .login(formValue.email, formValue.password)
+      .then(data => {
+        localStorage.setItem('jwt', data.token);
+        onLogin(true);
+        navigate('/', { replace: true });
+      })
+      .catch(err => {
+        setErrorMessage((err = 'Неверый логин или пароль пользователя'));
+      });
+  }
 
   return (
     <CurrentUserContext.Provider
@@ -248,11 +287,15 @@ function App() {
                   isSuccess={isSuccess}
                   setInfoTooltipPopupOpen={setInfoTooltipPopupOpen}
                   setIsSuccess={setIsSuccess}
+                  onRegister={handleRegister}
                 />
               }
             />
 
-            <Route path="/sign-in" element={<Login onLogin={setIsLoggedIn} />} />
+            <Route
+              path="/sign-in"
+              element={<Login onLogin={setIsLoggedIn} onLoggedIn={onLoggedIn} />}
+            />
 
             <Route
               path="/"
@@ -260,6 +303,7 @@ function App() {
                 isLoggedIn ? <Navigate to="/" replace /> : <Navigate to="/sign-in" replace />
               }
             />
+            <Route path="/*" element={<Navigate to="/sign-in" replace />} />
           </Routes>
 
           {isLoggedIn && <Footer />}
@@ -299,6 +343,8 @@ function App() {
             isSuccess={isSuccess}
             isOpen={isInfoTooltipPopupOpen}
             onClose={closeAllPopups}
+            onSuccess={`Вы успешно авторизировались!`}
+            onError={`Что-то пошло не так! Попробуйте еще раз`}
           ></InfoTooltip>
         </div>
       </div>

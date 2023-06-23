@@ -26,13 +26,15 @@ const validators = {
   }
 };
 
-function Login({ onLogin }) {
+function Login({ onLogin, onLoggedIn }) {
+  // Редирект с помощью хука useNavigate
+  const navigate = useNavigate();
+
+  //Стейты для импутов
   const [formValue, setFormValue] = useState({
     email: '',
     password: ''
   });
-
-  const navigate = useNavigate();
 
   //Стейт ошибок сервера
   const [errorMessage, setErrorMessage] = useState('');
@@ -76,27 +78,16 @@ function Login({ onLogin }) {
     [formValue, setErrors]
   );
 
+  //Сохранение значений импутов по event в объект
   const handleChange = e => {
     const { name, value } = e.target;
     setFormValue({ ...formValue, [name]: value });
   };
 
+  //Обработка сабмита + вызов колбека из App
   const handleSubmit = e => {
     e.preventDefault();
-    if (!formValue.email || !formValue.password) {
-      setErrorMessage('Заполните все поля формы');
-      return;
-    }
-    auth
-      .login(formValue.email, formValue.password)
-      .then(data => {
-        localStorage.setItem('jwt', data.token);
-        onLogin(true);
-        navigate('/', { replace: true });
-      })
-      .catch(err => {
-        setErrorMessage((err = 'Неверый логин или пароль пользователя'));
-      });
+    onLoggedIn(formValue, onLogin, setErrorMessage);
   };
 
   return (

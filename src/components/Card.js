@@ -4,11 +4,11 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function Card(props) {
   //Подписка на контекст currentUser
-  const currentUser = React.useContext(CurrentUserContext);
+  const user = React.useContext(CurrentUserContext);
   //Проверка своей карточки для отображения корзины
-  const isOwn = props.card.owner._id === currentUser._id;
+  const isOwn = props.card.owner._id === user.currentUser._id;
   //console.log(currentUser._id);
-  const isLiked = props.card.likes.some(item => item._id === currentUser._id);
+  const isLiked = props.card.likes.some(item => item._id === user.currentUser._id);
   const cardLikeButtonClassName = `element__heart ${isLiked ? 'element__heart_active' : ''}`;
 
   function handleClick() {

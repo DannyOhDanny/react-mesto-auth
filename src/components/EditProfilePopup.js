@@ -31,11 +31,6 @@ function EditProfilePopup(props) {
       about: description
     });
   }
-  // Очистка импутов  при открытии попапа
-  useEffect(() => {
-    setName('');
-    setDescription('');
-  }, [currentUser, props.isOpen]);
 
   return (
     <PopupWithForm

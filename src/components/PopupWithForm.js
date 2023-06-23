@@ -6,14 +6,17 @@ function PopupWithForm(props) {
   //Закрытие попапа по Esc
   useEffect(() => {
     function handleEscapeKey(event) {
+      if (!props.isOpen) return;
+
       if (event.key === 'Escape') {
         props.onClose();
       }
     }
 
     document.addEventListener('keydown', handleEscapeKey);
+
     return () => document.removeEventListener('keydown', handleEscapeKey);
-  }, []);
+  }, [props.isOpen]);
 
   //Закрытие попапа по клику на overlay
   function handleClickonOverlay(e) {
