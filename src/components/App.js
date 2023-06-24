@@ -241,6 +241,7 @@ function App() {
       .login(formValue.email, formValue.password)
       .then(data => {
         localStorage.setItem('jwt', data.token);
+
         onLogin(true);
         navigate('/', { replace: true });
       })

@@ -58,6 +58,7 @@
 @import url(./blocks/auth-popup/auth-popup.css);
 @import url(./blocks/auth-popup/__image/auth-popup__image.css);
 @import url(./blocks/auth-popup/__caption/auth-popup__caption.css);
+@import url(./blocks/mobile/mobile_btn.css);
 
 @import url(./blocks/page/page.css);
 @import url(./blocks/root/root.css);

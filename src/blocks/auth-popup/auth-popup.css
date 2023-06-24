@@ -1,8 +1,8 @@
 .auth-popup {
   display: flex;
   flex-direction: column;
-  min-width: 430px;
-  min-height: 330px;
+  max-width: 430px;
+  max-height: 330px;
   width: 100%;
   margin: 0 auto;
   padding: 0;

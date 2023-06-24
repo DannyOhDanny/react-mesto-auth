@@ -1,6 +1,7 @@
 import React from 'react';
 import Card from './Card';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import png from '../images/Group 5.png';
 
 function Main(props) {
   //Подписка на контекст currentUser
