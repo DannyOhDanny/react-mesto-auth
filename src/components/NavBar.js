@@ -6,12 +6,14 @@ import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function NavBar(props) {
+  //Подписка на контекст
   const user = React.useContext(CurrentUserContext);
-
+  //Стейт мобильного меню
   const [nav, setNav] = useState(false);
 
   const navigate = useNavigate();
 
+  //Ф-ия удаления токена и обнуления стейтов после выхода
   function signOut() {
     localStorage.removeItem('jwt');
     props.setIsLoggedIn(false);

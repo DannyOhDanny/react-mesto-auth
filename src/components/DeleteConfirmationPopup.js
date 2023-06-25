@@ -6,7 +6,6 @@ function DeleteConfirmationPopup(props) {
   function handleSubmit(e) {
     e.preventDefault();
     props.onDeleteCard(props.card);
-    props.onClose();
   }
 
   return (

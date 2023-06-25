@@ -42,37 +42,41 @@ function App() {
 
   //Получаем  данные пользователя с cервера
   useEffect(() => {
-    api
-      .getUserInfo()
-      .then(data => {
-        //console.log(data);
-        setCurrentUser({
-          _id: data._id,
-          name: data.name,
-          about: data.about,
-          avatar: data.avatar,
-          cohort: data.cohort
+    if (isLoggedIn) {
+      api
+        .getUserInfo()
+        .then(data => {
+          //console.log(data);
+          setCurrentUser({
+            _id: data._id,
+            name: data.name,
+            about: data.about,
+            avatar: data.avatar,
+            cohort: data.cohort
+          });
+        })
+        .catch(err => {
+          console.error(
+            `Возникла ошибка загрузки данных пользователя с сервера:${err} - ${err.statusText}`
+          );
         });
-      })
-      .catch(err => {
-        console.error(
-          `Возникла ошибка загрузки данных пользователя с сервера:${err} - ${err.statusText}`
-        );
-      });
+    }
   }, [isLoggedIn]);
 
   //Получаем карточки с сервера
   useEffect(() => {
-    api
-      .getCardsFromServer()
-      .then(cardsData => {
-        setCards(cardsData);
-      })
-      .catch(err => {
-        console.error(
-          `Возникла ошибка загрузки данных карточек с сервера:${err} - ${err.statusText}`
-        );
-      });
+    if (isLoggedIn) {
+      api
+        .getCardsFromServer()
+        .then(cardsData => {
+          setCards(cardsData);
+        })
+        .catch(err => {
+          console.error(
+            `Возникла ошибка загрузки данных карточек с сервера:${err} - ${err.statusText}`
+          );
+        });
+    }
   }, [isLoggedIn]);
 
   //Открытие попапов
@@ -124,8 +128,8 @@ function App() {
         //удаляем из старого массива карточку и сохраняем новый массив
         const newCards = cards.filter(c => (c._id === card._id ? null : newCard));
         //отрисовываем новый массив
-        //setCards(newCards);
         setCards(cards => cards.filter(c => c._id !== card._id));
+        closeAllPopups();
       })
       .catch(err => {
         console.error(`Возникла ошибка удаления карточки:${err} - ${err.statusText}`);
@@ -191,8 +195,8 @@ function App() {
       .getContent(jwt)
       .then(res => {
         if (res) {
-          setIsEmail(res.data);
           setIsLoggedIn(true);
+          setIsEmail(res.data);
           navigate('/', { replace: true });
         }
         if (!res) {
@@ -210,6 +214,7 @@ function App() {
     checkToken();
   }, []);
 
+  //Ф-ия регистрации пользователя
   function handleRegister(formValue, setErrorMessage) {
     if (!formValue.email || !formValue.password) {
       setErrorMessage('Заполните все поля формы');
@@ -232,6 +237,7 @@ function App() {
       });
   }
 
+  //Ф-ия авторизации пользователя
   function onLoggedIn(formValue, onLogin, setErrorMessage) {
     if (!formValue.email || !formValue.password) {
       setErrorMessage('Заполните все поля формы');

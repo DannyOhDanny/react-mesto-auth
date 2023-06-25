@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react';
 import PopupWithForm from './PopupWithForm';
 
 function AddPlacePopup(props) {
+  //Стейты импутов
   const [name, setName] = useState('');
   const [link, setLink] = useState('');
 
+  //Обработка изменения импута от event
   function handleNameChange(e) {
     setName(e.target.value);
   }
@@ -13,7 +15,7 @@ function AddPlacePopup(props) {
   function handleLinkChange(e) {
     setLink(e.target.value);
   }
-
+  //Обработка сабмита формы
   function handleSubmit(e) {
     // Запрещаем браузеру переходить по адресу формы
     e.preventDefault();
@@ -23,7 +25,7 @@ function AddPlacePopup(props) {
       link
     });
   }
-
+  //Очистка полей формы после открытия попапа
   useEffect(() => {
     setName('');
     setLink('');
